@@ -5,6 +5,9 @@ import Card from './Card';
 const Countries = () => {
 
     const [data, setData] = useState([]);
+    const [rangeValue , setRangeValue] = useState(30);
+    const radios = ["Africa", "America", "Asia", "Europe", "Oceania"];
+    const [selectedRadio, setSelectedRadio] = useState("");
 
     useEffect ( () => {
 
@@ -18,9 +21,45 @@ const Countries = () => {
 
     return (
         <div className='countries'>
+            <div className='sort-container'>
+                <input 
+                    type="range"
+                    min="1"
+                    max="250"
+                    value={rangeValue}
+                    onChange={ (e) => setRangeValue(e.target.value) }
+                />
+                <ul>
+                    {radios.map( (radio) => {
+                        return (
+                            <li key={radio}>
+                                <input
+                                    type="radio"
+                                    value={radio}
+                                    id={radio}
+                                    checked={radio === selectedRadio}
+                                    onChange={(e) => setSelectedRadio(e.target.value)}
+                                />
+                                <label htmlFor={radio}>{radio}</label>
+                            </li>
+                        )
+                    })}
+                </ul>
+            </div>
+
+            <div className='cancel'>
+                {selectedRadio && (
+                    <h5 onClick={() => setSelectedRadio("")} >Annuler la recherche</h5>
+                )}
+            </div>
+
             <ul className='countries-list'>
                 { 
-                    data.map( (country) => {
+                    data
+                    .filter( (country) => country.region.includes(selectedRadio) )
+                    .sort( (a,b) => b.population - a.population )
+                    .filter( (country, index) => index < rangeValue)
+                    .map( (country) => {
                        return <Card 
                                 country={country} 
                                 key={country.name} 
